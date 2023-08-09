@@ -1,0 +1,20 @@
+#include <iostream>
+using namespace std;
+
+    int main() 
+{
+    int N,suma = 0;
+    
+   cout<< "Ingrese el numero (N): ";
+   cin>> N;
+    
+    // Calcula la suma de los N primeros numeros naturales
+    for (int i = 1; i <= N; i++) 
+	{
+        suma += i;
+    }
+    
+    cout << "La suma de los primeros " << N << " numeros naturales es: " << suma << endl;
+    
+    return 0;
+}

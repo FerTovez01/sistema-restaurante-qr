@@ -1,0 +1,28 @@
+#include <iostream>
+using namespace std;
+int main ()
+{
+
+int invertirCifras(int numero) {
+    int invertido = 0;
+    
+    while (numero != 0) {
+        invertido = (invertido * 10) + (numero % 10);
+        numero /= 10;
+    }
+    
+    return invertido;
+}
+int main(){
+
+    int numero;
+    
+    cout << "Ingrese un numero: ";
+    cin >> numero;
+    
+    int numeroInvertido = invertirCifras(numero);
+    
+    cout << "El numero con las cifras invertidas es: " << numeroInvertido << endl;
+}
+    return 0;
+}
