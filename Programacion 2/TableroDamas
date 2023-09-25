@@ -1,0 +1,29 @@
+//2.28
+public class TableroDamas
+{
+  public static void main (String[]args)
+  {
+    int tama C 1o = 8;		// TamaC1o del tablero de damas (8x8)
+
+    // Iterar sobre las filas
+    for (int fila = 0; fila < tama C 1o; fila++)
+      {
+	// Iterar sobre las columnas
+	for (int columna = 0; columna < tama C 1o; columna++)
+	  {
+	    // Si la suma de fila y columna es par, imprimir un asterisco
+	    if ((fila + columna) % 2 == 0)
+	      {
+		System.out.print ("* ");
+	      }
+	    else
+	      {
+		// Si la suma de fila y columna es impar, imprimir un espacio en blanco
+		System.out.print ("  ");
+	      }
+	  }
+	// Cambiar de lC-nea al final de cada fila
+	System.out.println ();
+      }
+  }
+}

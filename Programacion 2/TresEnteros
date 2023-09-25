@@ -1,0 +1,46 @@
+//2.17
+import java.util.Scanner;
+
+public class TresEnteros
+{
+  public static void main (String[]args)
+  {
+    // Crear un objeto Scanner para la entrada del usuario
+    Scanner entrada = new Scanner (System.in);
+
+    // Pedir al usuario que ingrese tres enteros
+      System.out.print ("Por favor, ingrese el primer nC:mero entero: ");
+    int numero1 = entrada.nextInt ();
+
+      System.out.print ("Por favor, ingrese el segundo nC:mero entero: ");
+    int numero2 = entrada.nextInt ();
+
+      System.out.print ("Por favor, ingrese el tercer nC:mero entero: ");
+    int numero3 = entrada.nextInt ();
+
+    // Calcular la suma de los nC:meros
+    int suma = numero1 + numero2 + numero3;
+
+    // Calcular el promedio (como un nC:mero entero)
+    int promedio = suma / 3;
+
+    // Calcular el producto de los nC:meros
+    int producto = numero1 * numero2 * numero3;
+
+    // Encontrar el nC:mero menor
+    int menor = Math.min (numero1, Math.min (numero2, numero3));
+
+    // Encontrar el nC:mero mayor
+    int mayor = Math.max (numero1, Math.max (numero2, numero3));
+
+    // Mostrar los resultados
+      System.out.println ("La suma de los nC:meros es: " + suma);
+      System.out.println ("El promedio de los nC:meros es: " + promedio);
+      System.out.println ("El producto de los nC:meros es: " + producto);
+      System.out.println ("El nC:mero menor es: " + menor);
+      System.out.println ("El nC:mero mayor es: " + mayor);
+
+    // Cerrar el objeto Scanner
+      entrada.close ();
+  }
+}

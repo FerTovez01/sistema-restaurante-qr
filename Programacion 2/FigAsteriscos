@@ -1,0 +1,98 @@
+//2.18
+
+public class FigurasAsteriscos
+{
+  public static void main (String[]args)
+  {
+    dibujarCuadro (5, 5);
+    System.out.println ();
+    dibujarOvalo (5, 5);
+    System.out.println ();
+    dibujarFlecha (5);
+    System.out.println ();
+    dibujarDiamante (5);
+  }
+
+  // MC)todo para dibujar un cuadro de asteriscos
+  public static void dibujarCuadro (int filas, int columnas)
+  {
+    for (int i = 1; i <= filas; i++)
+      {
+	for (int j = 1; j <= columnas; j++)
+	  {
+	    System.out.print ("* ");
+	  }
+	System.out.println ();
+      }
+  }
+
+  // MC)todo para dibujar un C3valo de asteriscos
+  public static void dibujarOvalo (int filas, int columnas)
+  {
+    for (int i = 1; i <= filas; i++)
+      {
+	for (int j = 1; j <= columnas; j++)
+	  {
+	    if (i == 1 || i == filas || j == 1 || j == columnas)
+	      {
+		System.out.print ("* ");
+	      }
+	    else
+	      {
+		System.out.print ("  ");
+	      }
+	  }
+	System.out.println ();
+      }
+  }
+
+  // MC)todo para dibujar una flecha de asteriscos
+  public static void dibujarFlecha (int altura)
+  {
+    for (int i = 1; i <= altura; i++)
+      {
+	for (int j = 1; j <= i; j++)
+	  {
+	    System.out.print ("* ");
+	  }
+	System.out.println ();
+      }
+    for (int i = altura - 1; i >= 1; i--)
+      {
+	for (int j = 1; j <= i; j++)
+	  {
+	    System.out.print ("* ");
+	  }
+	System.out.println ();
+      }
+  }
+
+  // MC)todo para dibujar un diamante de asteriscos
+  public static void dibujarDiamante (int altura)
+  {
+    for (int i = 1; i <= altura; i++)
+      {
+	for (int j = 1; j <= altura - i; j++)
+	  {
+	    System.out.print ("  ");
+	  }
+	for (int j = 1; j <= 2 * i - 1; j++)
+	  {
+	    System.out.print ("* ");
+	  }
+	System.out.println ();
+      }
+    for (int i = altura - 1; i >= 1; i--)
+      {
+	for (int j = 1; j <= altura - i; j++)
+	  {
+	    System.out.print ("  ");
+	  }
+	for (int j = 1; j <= 2 * i - 1; j++)
+	  {
+	    System.out.print ("* ");
+	  }
+	System.out.println ();
+      }
+  }
+}

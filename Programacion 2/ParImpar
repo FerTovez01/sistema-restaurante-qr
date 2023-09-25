@@ -1,0 +1,28 @@
+//2.25
+import java.util.Scanner;
+
+public class ParImpar
+{
+  public static void main (String[]args)
+  {
+    // Crear un objeto Scanner para la entrada del usuario
+    Scanner entrada = new Scanner (System.in);
+
+    // Pedir al usuario que ingrese un entero
+      System.out.print ("Por favor, ingrese un nC:mero entero: ");
+    int numero = entrada.nextInt ();
+
+    // Verificar si el nC:mero es par o impar
+    if (numero % 2 == 0)
+      {
+	System.out.println ("El nC:mero " + numero + " es par.");
+      }
+    else
+      {
+	System.out.println ("El nC:mero " + numero + " es impar.");
+      }
+
+    // Cerrar el objeto Scanner
+    entrada.close ();
+  }
+}
