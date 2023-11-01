@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 class Fecha {
     private int mes;
     private int dia;
@@ -40,9 +42,29 @@ class Fecha {
 
 public class PruebaFecha1 {
     public static void main(String[] args) {
-        // Crear dos objetos Fecha
-        Fecha fecha1 = new Fecha(9, 1, 2023);
-        Fecha fecha2 = new Fecha(9, 15, 2023);
+        Scanner scanner = new Scanner(System.in);
+
+        // Solicitar al usuario que ingrese la primera fecha
+        System.out.println("Ingrese la primera fecha:");
+        System.out.print("Mes: ");
+        int mes1 = scanner.nextInt();
+        System.out.print("Día: ");
+        int dia1 = scanner.nextInt();
+        System.out.print("Año: ");
+        int año1 = scanner.nextInt();
+
+        // Solicitar al usuario que ingrese la segunda fecha
+        System.out.println("Ingrese la segunda fecha:");
+        System.out.print("Mes: ");
+        int mes2 = scanner.nextInt();
+        System.out.print("Día: ");
+        int dia2 = scanner.nextInt();
+        System.out.print("Año: ");
+        int año2 = scanner.nextInt();
+
+        // Crear objetos Fecha con las fechas ingresadas por el usuario
+        Fecha fecha1 = new Fecha(mes1, dia1, año1);
+        Fecha fecha2 = new Fecha(mes2, dia2, año2);
 
         // Mostrar las fechas
         System.out.print("Fecha 1: ");
@@ -53,6 +75,8 @@ public class PruebaFecha1 {
         // Calcular la diferencia en días
         long diferenciaEnDias = calcularDiferenciaEnDias(fecha1, fecha2);
         System.out.println("La diferencia en días entre las fechas es: " + diferenciaEnDias + " días");
+
+        scanner.close();
     }
 
     public static long calcularDiferenciaEnDias(Fecha fecha1, Fecha fecha2) {
