@@ -1,45 +1,21 @@
 
 b) Leer 7 números (positivos y negativos) y calcular e imprimir su promedio:
-00 +102C   // Cargar un número en el acumulador
-01 +1020   // Cargar 0 en el acumulador (inicializar suma)
-02 +102F   // Cargar 7 en el acumulador (número de iteraciones)
-03 +2050   // Restar 1 al acumulador (decrementar contador)
-04 +3120   // Leer un número del teclado
-05 +212C   // Sumar el número leído al acumulador
-06 +1030   // Cargar 0 en el acumulador (preparar para imprimir)
-07 +4000   // Imprimir el contenido del acumulador
-08 +10F4   // Leer la posición de memoria 76
-09 +10F5   // Leer la posición de memoria 77
-10 +2040   // Restar 1 al acumulador (decrementar contador)
-11 +3180   // Leer otro número del teclado
-12 +214C   // Sumar el número leído al acumulador
-13 +31E0   // Leer otro número del teclado
-14 +214C   // Sumar el número leído al acumulador
-15 +31E0   // Leer otro número del teclado
-16 +214C   // Sumar el número leído al acumulador
-17 +31E0   // Leer otro número del teclado
-18 +214C   // Sumar el número leído al acumulador
-19 +31E0   // Leer otro número del teclado
-20 +214C   // Sumar el número leído al acumulador
-21 +3130   // Leer otro número del teclado
-22 +214C   // Sumar el número leído al acumulador
-23 +3130   // Leer otro número del teclado
-24 +214C   // Sumar el número leído al acumulador
-25 +3130   // Leer otro número del teclado
-26 +214C   // Sumar el número leído al acumulador
-27 +3130   // Leer otro número del teclado
-28 +214C   // Sumar el número leído al acumulador
-29 +3130   // Leer otro número del teclado
-30 +214C   // Sumar el número leído al acumulador
-31 +3130   // Leer otro número del teclado
-32 +214C   // Sumar el número leído al acumulador
-33 +3130   // Leer otro número del teclado
-34 +214C   // Sumar el número leído al acumulador
-35 +3130   // Leer otro número del teclado
-36 +214C   // Sumar el número leído al acumulador
-37 +3130   // Leer otro número del teclado
-38 +214C   // Sumar el número leído al acumulador
-39 +3130   // Leer otro número del teclado
-40 +214C   // Sumar el número leído al acumulador
-41 +3000   // Detener
-
+00 +1007    // Inicializa el contador en la ubicación 07
+01 +1100    // Lee el primer número en la ubicación 00
+02 +2007    // Suma el número al total
+03 +1300    // Lee el siguiente número
+04 +2007    // Suma el número al total
+05 +1300    // Lee el siguiente número
+06 +2007    // Suma el número al total
+07 +1300    // Lee el siguiente número
+08 +2007    // Suma el número al total
+09 +1300    // Lee el siguiente número
+10 +2007    // Suma el número al total
+11 +1300    // Lee el siguiente número
+12 +2007    // Suma el número al total
+13 +1300    // Lee el último número
+14 +2007    // Suma el último número al total
+15 +1107    // Lee el contador actual en la ubicación 07
+16 +3007    // Divide el total por el contador
+17 +2100    // Imprime el promedio
+18 +4300    // Fin del programa
