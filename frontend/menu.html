@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Digital | Restaurante Elegante</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Elegante -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>RESTAURANTE ELEGANTE</span>
+            </div>
+            <div class="mesa-info">
+                <i class="fas fa-table"></i>
+                <span id="mesa-numero">MESA-01</span>
+            </div>
+        </header>
+
+        <!-- Selector Tipo Pedido -->
+        <section class="selector-tipo">
+            <div class="tipo-buttons">
+                <button class="tipo-btn active" onclick="seleccionarTipo('local')">
+                    <i class="fas fa-utensils"></i>
+                    <span>Comer Aquí</span>
+                </button>
+                <button class="tipo-btn" onclick="seleccionarTipo('llevar')">
+                    <i class="fas fa-box"></i>
+                    <span>Para Llevar</span>
+                </button>
+                <button class="tipo-btn" onclick="seleccionarTipo('delivery')">
+                    <i class="fas fa-motorcycle"></i>
+                    <span>Delivery</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Datos Cliente (solo llevar/delivery) -->
+        <section class="datos-cliente" id="datos-cliente" style="display: none;">
+            <div class="form-group">
+                <input type="text" id="cliente-nombre" placeholder="👤 Tu nombre completo" class="form-input">
+            </div>
+            <div class="form-group">
+                <input type="tel" id="cliente-telefono" placeholder="📞 Tu número de teléfono" class="form-input">
+            </div>
+            <div class="form-group" id="grupo-direccion" style="display: none;">
+                <textarea id="cliente-direccion" placeholder="🏠 Dirección completa para delivery" class="form-textarea"></textarea>
+            </div>
+        </section>
+
+        <!-- Navegación Categorías -->
+        <nav class="categorias-nav" id="categorias-nav">
+            <div class="categorias-container">
+                <!-- Las categorías se cargan dinámicamente -->
+            </div>
+        </nav>
+
+        <!-- Lista de Productos -->
+        <main class="productos-main">
+            <div class="productos-container" id="productos-container">
+                <!-- Los productos se cargan dinámicamente -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Carrito Flotante -->
+    <div class="carrito-flotante" id="carrito-flotante" onclick="abrirCarrito()">
+        <div class="carrito-icon">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="carrito-badge" id="carrito-contador">0</span>
+        </div>
+        <div class="carrito-total" id="carrito-total">$0.00</div>
+    </div>
+
+    <!-- Modal Carrito -->
+    <div class="modal" id="modal-carrito">
+        <div class="modal-overlay" onclick="cerrarCarrito()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-shopping-bag"></i>
+                    Tu Pedido
+                </h2>
+                <button class="modal-close" onclick="cerrarCarrito()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="carrito-items" id="carrito-items">
+                    <!-- Items del carrito -->
+                </div>
+                
+                <div class="carrito-resumen">
+                    <div class="resumen-line">
+                        <span>Subtotal:</span>
+                        <span id="resumen-subtotal">$0.00</span>
+                    </div>
+                    <div class="resumen-line">
+                        <span>Impuestos (10%):</span>
+                        <span id="resumen-impuestos">$0.00</span>
+                    </div>
+                    <div class="resumen-line total">
+                        <span>Total:</span>
+                        <span id="resumen-total">$0.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarCarrito()">
+                    Seguir Comprando
+                </button>
+                <button class="btn btn-primary" onclick="procesarPago()">
+                    <i class="fas fa-credit-card"></i>
+                    Proceder al Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Cargando menú...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
