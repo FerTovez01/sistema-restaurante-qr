@@ -8,7 +8,7 @@ let sessionId = generarSessionId();
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Iniciando sistema restaurante...');
+    console.log('🚀 Iniciando Corrales Restaurant...');
     inicializarApp();
 });
 
@@ -23,7 +23,7 @@ async function inicializarApp() {
         ]);
         
         mostrarLoading(false);
-        console.log('✅ App inicializada correctamente');
+        console.log('✅ Corrales Restaurant inicializado correctamente');
     } catch (error) {
         console.error('❌ Error inicializando app:', error);
         mostrarError('Error cargando el menú. Recarga la página.');
@@ -43,6 +43,11 @@ function detectarMesa() {
     mesaActual = `MESA-${mesa.padStart(2, '0')}`;
     document.getElementById('mesa-numero').textContent = mesaActual;
     console.log('📍 Mesa detectada:', mesaActual);
+}
+
+// ===== FUNCIÓN PARA FORMATEAR PRECIOS EN LEMPIRAS =====
+function formatearPrecio(precio) {
+    return `L. ${parseFloat(precio).toFixed(2)}`;
 }
 
 async function cargarCategorias() {
@@ -97,47 +102,62 @@ function obtenerProductosEjemplo() {
     return [
         {
             id: 1,
-            nombre: "Hamburguesa Premium",
-            descripcion: "Carne 200g con queso cheddar y vegetales frescos",
-            precio: 15.99,
+            nombre: "Parrillada Corrales",
+            descripcion: "Mixto de carnes a la parrilla con chimol y tortillas",
+            precio: 280.00,
             categoria_id: 2,
-            ingredientes: "Carne, Queso, Lechuga, Tomate, Pan",
+            imagen: "/images/parrillada.jpg",
+            ingredientes: "Carne de res, chorizo, costilla, chimol, tortillas",
             destacado: true
         },
         {
             id: 2,
-            nombre: "Pizza Margarita",
-            descripcion: "Salsa de tomate natural con mozzarella fresca",
-            precio: 12.99,
-            categoria_id: 2,
-            ingredientes: "Masa, Salsa, Mozzarella, Albahaca",
+            nombre: "Sopa de Mariscos",
+            descripcion: "Sopa criolla con mixto de mariscos frescos",
+            precio: 180.00,
+            categoria_id: 1,
+            imagen: "/images/sopa-mariscos.jpg",
+            ingredientes: "Camarones, caracoles, pescado, yuca, plátano",
             destacado: false
         },
         {
             id: 3,
-            nombre: "Ensalada César",
-            descripcion: "Lechuga romana con pollo grillado y aderezo césar",
-            precio: 9.99,
-            categoria_id: 1,
-            ingredientes: "Lechuga, Pollo, Crutones, Parmesano",
-            destacado: false
+            nombre: "Baleada Especial",
+            descripcion: "Tortilla de harina con frijoles, queso y aguacate",
+            precio: 45.00,
+            categoria_id: 2,
+            imagen: "/images/baleada.jpg",
+            ingredientes: "Tortilla, frijoles, queso, aguacate, crema",
+            destacado: true
         },
         {
             id: 4,
-            nombre: "Refresco 500ml",
-            descripcion: "Bebida refrescante de tu elección",
-            precio: 2.99,
-            categoria_id: 3,
-            ingredientes: "",
+            nombre: "Pollo Chuco",
+            descripcion: "Pollo frito crujiente con tajadas y encurtido",
+            precio: 120.00,
+            categoria_id: 2,
+            imagen: "/images/pollo-chuco.jpg",
+            ingredientes: "Pollo, plátano, repollo, zanahoria, salsa",
             destacado: false
         },
         {
             id: 5,
-            nombre: "Tiramisú Clásico",
-            descripcion: "Postre italiano con café y mascarpone",
-            precio: 6.99,
+            nombre: "Horchata",
+            descripcion: "Bebida refrescante de arroz y canela",
+            precio: 25.00,
+            categoria_id: 3,
+            imagen: "/images/horchata.jpg",
+            ingredientes: "Arroz, canela, azúcar, especias",
+            destacado: false
+        },
+        {
+            id: 6,
+            nombre: "Tres Leches",
+            descripcion: "Postre tradicional hondureño",
+            precio: 60.00,
             categoria_id: 4,
-            ingredientes: "Mascarpone, Café, Cacao, Bizcochos",
+            imagen: "/images/tres-leches.jpg",
+            ingredientes: "Leche evaporada, leche condensada, crema, bizcocho",
             destacado: true
         }
     ];
@@ -170,9 +190,15 @@ function mostrarProductos(productosFiltrados) {
     
     container.innerHTML = productosFiltrados.map(producto => `
         <div class="producto-card ${producto.destacado ? 'destacado' : ''} fade-in">
+            ${producto.imagen ? `
+            <div class="producto-imagen">
+                <img src="${producto.imagen}" alt="${producto.nombre}" 
+                     onerror="this.style.display='none'">
+            </div>
+            ` : ''}
             <div class="producto-header">
                 <div class="producto-nombre">${producto.nombre}</div>
-                <div class="producto-precio">$${producto.precio}</div>
+                <div class="producto-precio">${formatearPrecio(producto.precio)}</div>
             </div>
             <div class="producto-descripcion">${producto.descripcion}</div>
             ${producto.ingredientes ? `
@@ -196,7 +222,6 @@ async function agregarAlCarrito(productoId) {
     const btn = document.querySelector(`[data-producto="${productoId}"]`);
     
     try {
-        // Intentar agregar al carrito del servidor
         const response = await fetch('/api/carrito/agregar', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -274,7 +299,7 @@ async function cargarCarrito() {
         }
     } catch (error) {
         console.error('Error cargando carrito del servidor:', error);
-        // Continuar con carrito local
+        // Usar carrito local
     }
     
     actualizarCarritoUI();
@@ -285,7 +310,7 @@ function actualizarCarritoUI() {
     const totalPrecio = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
     
     document.getElementById('carrito-contador').textContent = totalItems;
-    document.getElementById('carrito-total').textContent = `$${totalPrecio.toFixed(2)}`;
+    document.getElementById('carrito-total').textContent = formatearPrecio(totalPrecio);
     
     // Actualizar badge con animación
     const badge = document.getElementById('carrito-contador');
@@ -314,14 +339,14 @@ function cerrarCarrito() {
 function actualizarModalCarrito() {
     const container = document.getElementById('carrito-items');
     const subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-    const impuestos = subtotal * 0.10; // 10% de impuestos
+    const impuestos = subtotal * 0.15; // 15% de impuestos
     const total = subtotal + impuestos;
     
     container.innerHTML = carrito.map(item => `
         <div class="carrito-item fade-in">
             <div class="item-info">
                 <div class="item-nombre">${item.nombre}</div>
-                <div class="item-precio">$${item.precio} c/u</div>
+                <div class="item-precio">${formatearPrecio(item.precio)} c/u</div>
             </div>
             <div class="item-controls">
                 <button class="cantidad-btn" onclick="cambiarCantidad(${item.id}, -1)">-</button>
@@ -334,9 +359,9 @@ function actualizarModalCarrito() {
         </div>
     `).join('');
     
-    document.getElementById('resumen-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('resumen-impuestos').textContent = `$${impuestos.toFixed(2)}`;
-    document.getElementById('resumen-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('resumen-subtotal').textContent = formatearPrecio(subtotal);
+    document.getElementById('resumen-impuestos').textContent = formatearPrecio(impuestos);
+    document.getElementById('resumen-total').textContent = formatearPrecio(total);
 }
 
 function cambiarCantidad(productoId, cambio) {
@@ -393,8 +418,7 @@ function seleccionarTipo(tipo) {
     }
 }
 
-// ===== PAGO =====
-
+// ===== SISTEMA DE PAGO COMPLETO =====
 function procesarPago() {
     if (carrito.length === 0) {
         mostrarNotificacion('🛒 Tu carrito está vacío');
@@ -424,38 +448,354 @@ function procesarPago() {
         }
     }
     
-    // Guardar datos temporalmente
+    // Mostrar modal de métodos de pago
+    mostrarModalMetodosPago();
+}
+
+function mostrarModalMetodosPago() {
+    const subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    const impuestos = subtotal * 0.15; // 15% de impuestos Honduras
+    const total = subtotal + impuestos;
+    
+    const modalHTML = `
+        <div class="modal-overlay" onclick="cerrarModalPago()"></div>
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-credit-card"></i>
+                    Método de Pago
+                </h2>
+                <button class="modal-close" onclick="cerrarModalPago()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="resumen-pedido-pago">
+                    <h4>Resumen del Pedido:</h4>
+                    <div class="resumen-line">
+                        <span>Subtotal:</span>
+                        <span>${formatearPrecio(subtotal)}</span>
+                    </div>
+                    <div class="resumen-line">
+                        <span>Impuestos (15%):</span>
+                        <span>${formatearPrecio(impuestos)}</span>
+                    </div>
+                    <div class="resumen-line total">
+                        <span>Total a Pagar:</span>
+                        <span>${formatearPrecio(total)}</span>
+                    </div>
+                </div>
+                
+                <div class="metodos-pago">
+                    <h4>Selecciona tu método de pago:</h4>
+                    
+                    <div class="metodo-pago-option" onclick="seleccionarMetodoPago('efectivo')">
+                        <div class="metodo-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="metodo-info">
+                            <strong>Efectivo</strong>
+                            <span>Paga al momento de recibir tu pedido</span>
+                        </div>
+                        <div class="metodo-radio">
+                            <input type="radio" name="metodoPago" value="efectivo">
+                        </div>
+                    </div>
+                    
+                    <div class="metodo-pago-option" onclick="seleccionarMetodoPago('transferencia')">
+                        <div class="metodo-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="metodo-info">
+                            <strong>Transferencia Bancaria</strong>
+                            <span>Transfiere desde tu banco</span>
+                        </div>
+                        <div class="metodo-radio">
+                            <input type="radio" name="metodoPago" value="transferencia">
+                        </div>
+                    </div>
+                    
+                    <div class="metodo-pago-option" onclick="seleccionarMetodoPago('pos')">
+                        <div class="metodo-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="metodo-info">
+                            <strong>POS/Tarjeta</strong>
+                            <span>Paga con tarjeta al recibir</span>
+                        </div>
+                        <div class="metodo-radio">
+                            <input type="radio" name="metodoPago" value="pos">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Información Transferencia (oculta inicialmente) -->
+                <div id="info-transferencia" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4><i class="fas fa-info-circle"></i> Datos para Transferencia:</h4>
+                    <div class="datos-banco">
+                        <p><strong>Banco:</strong> BAC Credomatic</p>
+                        <p><strong>Cuenta:</strong> 1234567890123456</p>
+                        <p><strong>CLABE:</strong> 012345678901234567</p>
+                        <p><strong>Beneficiario:</strong> CORRALES RESTAURANT S. DE R.L.</p>
+                        <p><strong>RTN:</strong> 08011990123456</p>
+                    </div>
+                    <div class="comprobante-transferencia" style="margin-top: 15px;">
+                        <label>
+                            <input type="file" id="comprobante-pago" accept="image/*,.pdf" style="margin-top: 10px;">
+                            <small>Sube tu comprobante de transferencia (opcional)</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalPago()">
+                    Cancelar
+                </button>
+                <button class="btn btn-primary" id="btn-confirmar-pago" onclick="confirmarPedidoConPago()" disabled>
+                    <i class="fas fa-check"></i>
+                    Confirmar Pedido
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Crear modal
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-pago';
+    modal.innerHTML = modalHTML;
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function seleccionarMetodoPago(metodo) {
+    // Marcar radio button
+    document.querySelectorAll('input[name="metodoPago"]').forEach(radio => {
+        radio.checked = radio.value === metodo;
+    });
+    
+    // Mostrar/ocultar info de transferencia
+    const infoTransferencia = document.getElementById('info-transferencia');
+    if (metodo === 'transferencia') {
+        infoTransferencia.style.display = 'block';
+    } else {
+        infoTransferencia.style.display = 'none';
+    }
+    
+    // Habilitar botón de confirmar
+    document.getElementById('btn-confirmar-pago').disabled = false;
+}
+
+function cerrarModalPago() {
+    const modal = document.getElementById('modal-pago');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+async function confirmarPedidoConPago() {
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
+    if (!metodoPago) {
+        mostrarError('❌ Selecciona un método de pago');
+        return;
+    }
+    
+    const metodo = metodoPago.value;
+    
+    // Crear objeto de pedido
     const pedidoData = {
         session_id: sessionId,
-        mesa: mesaActual,
-        tipo: tipoPedido,
-        items: carrito,
+        mesa_id: obtenerIdMesa(),
+        tipo_pedido: tipoPedido,
+        metodo_pago: metodo,
         cliente: {
             nombre: document.getElementById('cliente-nombre').value,
             telefono: document.getElementById('cliente-telefono').value,
             direccion: document.getElementById('cliente-direccion').value
         },
+        items: carrito,
         total: carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0)
     };
     
-    localStorage.setItem('pedidoActual', JSON.stringify(pedidoData));
-    
-    // Simular proceso de pago
-    mostrarNotificacion('💰 Redirigiendo a métodos de pago...');
-    
-    setTimeout(() => {
-        // Aquí normalmente redirigirías a una página de pago
-        const total = pedidoData.total;
-        const metodoPago = confirm(`💰 Total: $${total.toFixed(2)}\n\n¿Deseas proceder con el pago?\n\nMétodos disponibles:\n• 💵 Efectivo\n• 📲 Transferencia\n• 💳 POS`);
+    try {
+        // Enviar pedido al servidor
+        const response = await fetch('/api/pedidos', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(pedidoData)
+        });
         
-        if (metodoPago) {
-            mostrarNotificacion('✅ Pedido confirmado! Tu comida está en preparación 🍳');
-            // Aquí limpiarías el carrito
-            carrito = [];
-            actualizarCarritoUI();
+        if (response.ok) {
+            const result = await response.json();
+            
+            // Guardar en localStorage para seguimiento
+            localStorage.setItem('ultimoPedido', JSON.stringify({
+                ...pedidoData,
+                numeroPedido: result.numero_pedido,
+                estado: 'confirmado',
+                fecha: new Date().toISOString(),
+                tiempoEstimado: '20-30 minutos'
+            }));
+            
+            // Cerrar modales
+            cerrarModalPago();
             cerrarCarrito();
+            
+            // Mostrar pantalla de seguimiento
+            mostrarSeguimientoPedido();
+            
+        } else {
+            throw new Error('Error en el servidor');
         }
-    }, 2000);
+        
+    } catch (error) {
+        console.error('Error confirmando pedido:', error);
+        // Fallback: guardar localmente
+        localStorage.setItem('ultimoPedido', JSON.stringify({
+            ...pedidoData,
+            numeroPedido: 'P' + Date.now(),
+            estado: 'confirmado',
+            fecha: new Date().toISOString(),
+            tiempoEstimado: '20-30 minutos'
+        }));
+        
+        cerrarModalPago();
+        cerrarCarrito();
+        mostrarSeguimientoPedido();
+    }
+}
+
+// ===== SISTEMA DE SEGUIMIENTO =====
+function mostrarSeguimientoPedido() {
+    const pedido = JSON.parse(localStorage.getItem('ultimoPedido'));
+    if (!pedido) return;
+    
+    const seguimientoHTML = `
+        <div class="modal-overlay" onclick="cerrarSeguimiento()"></div>
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-truck"></i>
+                    ¡Pedido Confirmado!
+                </h2>
+            </div>
+            
+            <div class="modal-body">
+                <div class="confirmacion-pedido">
+                    <div class="confirmacion-icon">
+                        <i class="fas fa-check-circle" style="color: #27ae60; font-size: 48px;"></i>
+                    </div>
+                    <h3 style="text-align: center; color: #27ae60; margin: 15px 0;">¡Gracias por tu pedido!</h3>
+                    
+                    <div class="info-pedido">
+                        <p><strong>Número de Pedido:</strong> ${pedido.numeroPedido}</p>
+                        <p><strong>Total:</strong> ${formatearPrecio(pedido.total)}</p>
+                        <p><strong>Método de Pago:</strong> ${obtenerTextoMetodoPago(pedido.metodo_pago)}</p>
+                        <p><strong>Tiempo Estimado:</strong> ${pedido.tiempoEstimado}</p>
+                    </div>
+                </div>
+                
+                <div class="seguimiento-estados">
+                    <h4>Seguimiento de tu pedido:</h4>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item active">
+                            <div class="timeline-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <strong>Pedido Recibido</strong>
+                                <span>Hemos recibido tu pedido</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <strong>En Preparación</strong>
+                                <span>Tu comida está en cocina</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <strong>Listo</strong>
+                                <span>Tu pedido está listo</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <strong>Entregado</strong>
+                                <span>Pedido completado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="acciones-seguimiento">
+                    <p><small>Puedes cerrar esta ventana. Te notificaremos cuando tu pedido avance.</small></p>
+                    <button class="btn btn-primary" onclick="cerrarSeguimientoYLimpiar()">
+                        <i class="fas fa-home"></i>
+                        Volver al Menú
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-seguimiento';
+    modal.innerHTML = seguimientoHTML;
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function obtenerTextoMetodoPago(metodo) {
+    const metodos = {
+        'efectivo': '💵 Efectivo',
+        'transferencia': '🏦 Transferencia Bancaria', 
+        'pos': '💳 POS/Tarjeta'
+    };
+    return metodos[metodo] || metodo;
+}
+
+function cerrarSeguimiento() {
+    const modal = document.getElementById('modal-seguimiento');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+function cerrarSeguimientoYLimpiar() {
+    // Limpiar carrito
+    carrito = [];
+    actualizarCarritoUI();
+    
+    // Limpiar formularios
+    document.getElementById('cliente-nombre').value = '';
+    document.getElementById('cliente-telefono').value = '';
+    document.getElementById('cliente-direccion').value = '';
+    
+    // Cerrar modal
+    cerrarSeguimiento();
+    
+    mostrarNotificacion('✅ Pedido completado. ¡Gracias por elegir Corrales Restaurant!');
 }
 
 // ===== UTILIDADES =====
@@ -510,12 +850,19 @@ document.addEventListener('click', function(event) {
     if (event.target === modal) {
         cerrarCarrito();
     }
+    
+    const modalPago = document.getElementById('modal-pago');
+    if (event.target === modalPago) {
+        cerrarModalPago();
+    }
 });
 
 // Prevenir cierre con ESC
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         cerrarCarrito();
+        cerrarModalPago();
+        cerrarSeguimiento();
     }
 });
 
@@ -534,4 +881,4 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-console.log('🎯 Sistema de Restaurante QR - Frontend cargado');
+console.log('🎯 Corrales Restaurant - Sistema de pedidos cargado');
