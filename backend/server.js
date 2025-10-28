@@ -195,6 +195,197 @@ app.post('/api/pedidos', async (req, res) => {
   }
 });
 
+// ===== RUTAS PARA EL PANEL ADMINISTRATIVO =====
+
+// Obtener todos los pedidos
+app.get('/api/admin/pedidos', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT p.*, m.numero as mesa_numero,
+             COUNT(d.id) as total_items
+      FROM pedidos p
+      LEFT JOIN mesas m ON p.mesa_id = m.id
+      LEFT JOIN detalles_pedido d ON p.id = d.pedido_id
+      WHERE DATE(p.created_at) = CURRENT_DATE
+      GROUP BY p.id, m.numero
+      ORDER BY p.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener estadísticas del dashboard
+app.get('/api/admin/estadisticas', async (req, res) => {
+  try {
+    // Estadísticas del día
+    const ventasHoy = await pool.query(`
+      SELECT 
+        COUNT(*) as total_pedidos,
+        COALESCE(SUM(total), 0) as total_ventas,
+        COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pedidos_pendientes,
+        COUNT(CASE WHEN estado = 'preparacion' THEN 1 END) as en_preparacion,
+        COUNT(CASE WHEN estado = 'listo' THEN 1 END) as pedidos_listos
+      FROM pedidos 
+      WHERE DATE(created_at) = CURRENT_DATE
+    `);
+
+    // Mesas activas
+    const mesasActivas = await pool.query(`
+      SELECT COUNT(*) as mesas_ocupadas
+      FROM mesas 
+      WHERE estado = 'ocupada' AND activa = true
+    `);
+
+    // Métodos de pago
+    const metodosPago = await pool.query(`
+      SELECT 
+        metodo_pago,
+        COUNT(*) as cantidad,
+        COALESCE(SUM(total), 0) as total
+      FROM pedidos 
+      WHERE DATE(created_at) = CURRENT_DATE AND pagado = true
+      GROUP BY metodo_pago
+    `);
+
+    res.json({
+      ventas_hoy: ventasHoy.rows[0],
+      mesas_activas: mesasActivas.rows[0],
+      metodos_pago: metodosPago.rows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener reporte de ventas
+app.get('/api/admin/reporte-ventas', async (req, res) => {
+  try {
+    const { periodo = 'hoy' } = req.query;
+    
+    let whereClause = "WHERE DATE(p.created_at) = CURRENT_DATE";
+    if (periodo === 'semana') {
+      whereClause = "WHERE p.created_at >= CURRENT_DATE - INTERVAL '7 days'";
+    } else if (periodo === 'mes') {
+      whereClause = "WHERE p.created_at >= CURRENT_DATE - INTERVAL '30 days'";
+    }
+
+    const ventasResult = await pool.query(`
+      SELECT 
+        COUNT(*) as total_pedidos,
+        COALESCE(SUM(p.total), 0) as total_ventas,
+        COALESCE(AVG(p.total), 0) as ticket_promedio,
+        COUNT(CASE WHEN p.pagado = true THEN 1 END) as pedidos_pagados,
+        COUNT(CASE WHEN p.pagado = false THEN 1 END) as pedidos_pendientes_pago
+      FROM pedidos p
+      ${whereClause}
+    `);
+
+    // Productos más vendidos
+    const productosMasVendidos = await pool.query(`
+      SELECT 
+        pr.nombre,
+        SUM(d.cantidad) as total_vendido,
+        SUM(d.subtotal) as total_ingresos
+      FROM detalles_pedido d
+      JOIN productos pr ON d.producto_id = pr.id
+      JOIN pedidos p ON d.pedido_id = p.id
+      ${whereClause}
+      GROUP BY pr.id, pr.nombre
+      ORDER BY total_vendido DESC
+      LIMIT 10
+    `);
+
+    // Mesas más activas
+    const mesasActivas = await pool.query(`
+      SELECT 
+        m.numero,
+        COUNT(p.id) as total_pedidos,
+        COALESCE(SUM(p.total), 0) as total_ventas
+      FROM pedidos p
+      JOIN mesas m ON p.mesa_id = m.id
+      ${whereClause}
+      GROUP BY m.id, m.numero
+      ORDER BY total_ventas DESC
+      LIMIT 5
+    `);
+
+    res.json({
+      resumen: ventasResult.rows[0],
+      productos_mas_vendidos: productosMasVendidos.rows,
+      mesas_activas: mesasActivas.rows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener productos para administración
+app.get('/api/admin/productos', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT p.*, c.nombre as categoria_nombre,
+             (SELECT COUNT(*) FROM detalles_pedido dp WHERE dp.producto_id = p.id) as total_vendido
+      FROM productos p
+      JOIN categorias c ON p.categoria_id = c.id
+      ORDER BY p.disponible DESC, p.nombre
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Actualizar estado de pedido
+app.put('/api/admin/pedidos/:id/estado', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+    
+    await pool.query(
+      'UPDATE pedidos SET estado = $1 WHERE id = $2',
+      [estado, id]
+    );
+    
+    res.json({ success: true, message: 'Estado actualizado correctamente' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Marcar pedido como pagado
+app.put('/api/admin/pedidos/:id/pagar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(
+      'UPDATE pedidos SET pagado = true WHERE id = $1',
+      [id]
+    );
+    
+    res.json({ success: true, message: 'Pedido marcado como pagado' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener pagos pendientes
+app.get('/api/admin/pagos-pendientes', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT p.*, m.numero as mesa_numero
+      FROM pedidos p
+      LEFT JOIN mesas m ON p.mesa_id = m.id
+      WHERE p.pagado = false
+      ORDER BY p.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Ruta principal - servir el menú
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/menu.html'));
