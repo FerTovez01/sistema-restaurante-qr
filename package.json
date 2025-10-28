@@ -1,6 +1,7 @@
 {
   "name": "sistema-restaurante-qr",
   "version": "1.0.0",
+  "description": "Sistema de pedidos con QR para restaurante",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js"
