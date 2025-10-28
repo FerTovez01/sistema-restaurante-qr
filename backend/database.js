@@ -1,14 +1,29 @@
 const { Pool } = require('pg');
 
+// Configuración mejorada del pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: {
+    rejectUnauthorized: false
+  },
+  // Configuraciones adicionales para mejor rendimiento
+  max: 20, // máximo de clientes en el pool
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// Manejar errores de conexión
+pool.on('error', (err, client) => {
+  console.error('❌ Error inesperado en el pool de base de datos:', err);
 });
 
 async function inicializarBaseDeDatos() {
+  let client;
   try {
-    const client = await pool.connect();
-    
+    console.log('🔗 Conectando a la base de datos...');
+    client = await pool.connect();
+    console.log('✅ Conectado a PostgreSQL exitosamente');
+
     // TABLAS DEL SISTEMA COMPLETO
     await client.query(`
       -- Mesas del restaurante
@@ -94,6 +109,8 @@ async function inicializarBaseDeDatos() {
       );
     `);
 
+    console.log('✅ Tablas creadas/verificadas');
+
     // DATOS INICIALES PARA CORRALES RESTAURANT
     await client.query(`
       -- Categorías
@@ -128,11 +145,30 @@ async function inicializarBaseDeDatos() {
       ON CONFLICT DO NOTHING;
     `);
 
-    client.release();
-    console.log('✅ Base de datos de Corrales Restaurant inicializada');
+    console.log('✅ Datos iniciales insertados');
+    
   } catch (error) {
     console.error('❌ Error inicializando base de datos:', error);
+    throw error; // Propagar el error para manejarlo en server.js
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 }
 
-module.exports = { pool, inicializarBaseDeDatos };
+// Función para verificar conexión
+async function verificarConexion() {
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT NOW()');
+    client.release();
+    console.log('✅ Conexión a BD verificada:', result.rows[0].now);
+    return true;
+  } catch (error) {
+    console.error('❌ Error verificando conexión a BD:', error);
+    return false;
+  }
+}
+
+module.exports = { pool, inicializarBaseDeDatos, verificarConexion };
