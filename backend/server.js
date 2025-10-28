@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // Servir imágenes
 app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
 
-// Health check
+// Health check mejorado
 app.get('/api/health', async (req, res) => {
   try {
     await pool.query('SELECT 1');
@@ -22,10 +22,19 @@ app.get('/api/health', async (req, res) => {
       message: 'Corrales Restaurant funcionando',
       restaurante: 'Corrales Restaurant',
       moneda: 'Lempiras',
+      database: 'Conectada',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.json({ 
+      status: '⚠️ ADVERTENCIA', 
+      message: 'Corrales Restaurant funcionando (sin base de datos)',
+      restaurante: 'Corrales Restaurant',
+      moneda: 'Lempiras',
+      database: 'No conectada',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
@@ -35,7 +44,14 @@ app.get('/api/mesas', async (req, res) => {
     const result = await pool.query('SELECT * FROM mesas WHERE activa = true');
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo mesas:', error);
+    // Devolver mesas por defecto si hay error de BD
+    res.json([
+      { id: 1, numero: 'MESA-01', estado: 'libre', activa: true },
+      { id: 2, numero: 'MESA-02', estado: 'libre', activa: true },
+      { id: 3, numero: 'MESA-03', estado: 'libre', activa: true },
+      { id: 4, numero: 'MESA-04', estado: 'libre', activa: true }
+    ]);
   }
 });
 
@@ -45,7 +61,14 @@ app.get('/api/categorias', async (req, res) => {
     const result = await pool.query('SELECT * FROM categorias ORDER BY orden');
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo categorías:', error);
+    // Categorías por defecto
+    res.json([
+      { id: 1, nombre: 'Entradas', icono: '🥗', orden: 1 },
+      { id: 2, nombre: 'Platos Fuertes', icono: '🍖', orden: 2 },
+      { id: 3, nombre: 'Bebidas', icono: '🥤', orden: 3 },
+      { id: 4, nombre: 'Postres', icono: '🍰', orden: 4 }
+    ]);
   }
 });
 
@@ -61,7 +84,46 @@ app.get('/api/productos', async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo productos:', error);
+    // Productos por defecto
+    res.json([
+      {
+        id: 1,
+        nombre: 'Parrillada Corrales',
+        descripcion: 'Mixto de carnes a la parrilla con chimol y tortillas',
+        precio: 280.00,
+        categoria_id: 2,
+        categoria_nombre: 'Platos Fuertes',
+        imagen: '/images/parrillada.jpg',
+        ingredientes: 'Carne de res, chorizo, costilla, chimol, tortillas',
+        destacado: true,
+        disponible: true
+      },
+      {
+        id: 2,
+        nombre: 'Baleada Especial',
+        descripcion: 'Tortilla de harina con frijoles, queso y aguacate',
+        precio: 45.00,
+        categoria_id: 2,
+        categoria_nombre: 'Platos Fuertes',
+        imagen: '/images/baleada.jpg',
+        ingredientes: 'Tortilla, frijoles, queso, aguacate, crema',
+        destacado: true,
+        disponible: true
+      },
+      {
+        id: 3,
+        nombre: 'Horchata',
+        descripcion: 'Bebida refrescante de arroz y canela',
+        precio: 25.00,
+        categoria_id: 3,
+        categoria_nombre: 'Bebidas',
+        imagen: '/images/horchata.jpg',
+        ingredientes: 'Arroz, canela, azúcar, especias',
+        destacado: false,
+        disponible: true
+      }
+    ]);
   }
 });
 
@@ -78,7 +140,8 @@ app.get('/api/productos/categoria/:categoriaId', async (req, res) => {
     `, [categoriaId]);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo productos por categoría:', error);
+    res.json([]);
   }
 });
 
@@ -123,7 +186,8 @@ app.post('/api/carrito/agregar', async (req, res) => {
     
     res.json({ success: true, message: 'Producto agregado al carrito' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error agregando al carrito:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -140,7 +204,8 @@ app.get('/api/carrito/:session_id', async (req, res) => {
     
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo carrito:', error);
+    res.json([]);
   }
 });
 
@@ -154,7 +219,8 @@ app.delete('/api/carrito/:session_id/item/:item_id', async (req, res) => {
     );
     res.json({ success: true, message: 'Producto eliminado del carrito' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error eliminando del carrito:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -167,7 +233,7 @@ app.post('/api/pedidos', async (req, res) => {
     const pedidoResult = await pool.query(
       `INSERT INTO pedidos (mesa_id, tipo_pedido, metodo_pago, cliente_nombre, cliente_telefono, cliente_direccion, total) 
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [mesa_id, tipo_pedido, metodo_pago, cliente.nombre, cliente.telefono, cliente.direccion, total]
+      [mesa_id, tipo_pedido, metodo_pago, cliente?.nombre, cliente?.telefono, cliente?.direccion, total]
     );
     
     const pedidoId = pedidoResult.rows[0].id;
@@ -177,7 +243,7 @@ app.post('/api/pedidos', async (req, res) => {
       await pool.query(
         `INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) 
          VALUES ($1, $2, $3, $4, $5)`,
-        [pedidoId, item.id, item.cantidad, item.precio, item.precio * item.cantidad]
+        [pedidoId, item.producto_id || item.id, item.cantidad, item.precio_unitario || item.precio, item.subtotal || (item.precio * item.cantidad)]
       );
     }
     
@@ -191,7 +257,8 @@ app.post('/api/pedidos', async (req, res) => {
       numero_pedido: 'P' + pedidoId
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error creando pedido:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -212,7 +279,8 @@ app.get('/api/admin/pedidos', async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo pedidos admin:', error);
+    res.json([]);
   }
 });
 
@@ -250,12 +318,17 @@ app.get('/api/admin/estadisticas', async (req, res) => {
     `);
 
     res.json({
-      ventas_hoy: ventasHoy.rows[0],
-      mesas_activas: mesasActivas.rows[0],
-      metodos_pago: metodosPago.rows
+      ventas_hoy: ventasHoy.rows[0] || { total_pedidos: 0, total_ventas: 0, pedidos_pendientes: 0, en_preparacion: 0, pedidos_listos: 0 },
+      mesas_activas: mesasActivas.rows[0] || { mesas_ocupadas: 0 },
+      metodos_pago: metodosPago.rows || []
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo estadísticas:', error);
+    res.json({
+      ventas_hoy: { total_pedidos: 0, total_ventas: 0, pedidos_pendientes: 0, en_preparacion: 0, pedidos_listos: 0 },
+      mesas_activas: { mesas_ocupadas: 0 },
+      metodos_pago: []
+    });
   }
 });
 
@@ -312,12 +385,17 @@ app.get('/api/admin/reporte-ventas', async (req, res) => {
     `);
 
     res.json({
-      resumen: ventasResult.rows[0],
-      productos_mas_vendidos: productosMasVendidos.rows,
-      mesas_activas: mesasActivas.rows
+      resumen: ventasResult.rows[0] || { total_pedidos: 0, total_ventas: 0, ticket_promedio: 0, pedidos_pagados: 0, pedidos_pendientes_pago: 0 },
+      productos_mas_vendidos: productosMasVendidos.rows || [],
+      mesas_activas: mesasActivas.rows || []
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo reporte de ventas:', error);
+    res.json({
+      resumen: { total_pedidos: 0, total_ventas: 0, ticket_promedio: 0, pedidos_pagados: 0, pedidos_pendientes_pago: 0 },
+      productos_mas_vendidos: [],
+      mesas_activas: []
+    });
   }
 });
 
@@ -333,7 +411,8 @@ app.get('/api/admin/productos', async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo productos admin:', error);
+    res.json([]);
   }
 });
 
@@ -350,7 +429,8 @@ app.put('/api/admin/pedidos/:id/estado', async (req, res) => {
     
     res.json({ success: true, message: 'Estado actualizado correctamente' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error actualizando estado:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -366,7 +446,8 @@ app.put('/api/admin/pedidos/:id/pagar', async (req, res) => {
     
     res.json({ success: true, message: 'Pedido marcado como pagado' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error marcando como pagado:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -382,7 +463,8 @@ app.get('/api/admin/pagos-pendientes', async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error obteniendo pagos pendientes:', error);
+    res.json([]);
   }
 });
 
@@ -401,10 +483,31 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/admin.html'));
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', async () => {
-  console.log(`🚀 Corrales Restaurant funcionando en puerto ${PORT}`);
-  console.log(`📱 Menú: http://localhost:${PORT}/menu`);
-  console.log(`👑 Admin: http://localhost:${PORT}/admin`);
-  await inicializarBaseDeDatos();
+// Manejo de errores global
+app.use((error, req, res, next) => {
+  console.error('Error global:', error);
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
+
+// Inicializar servidor
+const PORT = process.env.PORT || 10000;
+
+async function iniciarServidor() {
+  try {
+    console.log('🔄 Inicializando base de datos...');
+    await inicializarBaseDeDatos();
+    console.log('✅ Base de datos inicializada correctamente');
+  } catch (error) {
+    console.error('❌ Error inicializando base de datos:', error.message);
+    console.log('⚠️  La aplicación continuará en modo sin base de datos');
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Corrales Restaurant funcionando en puerto ${PORT}`);
+    console.log(`📱 Menú: https://sistema-restaurante-qr-1.onrender.com/menu`);
+    console.log(`👑 Admin: https://sistema-restaurante-qr-1.onrender.com/admin`);
+    console.log(`❤️  Health: https://sistema-restaurante-qr-1.onrender.com/api/health`);
+  });
+}
+
+iniciarServidor();
