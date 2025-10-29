@@ -882,3 +882,185 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('🎯 Corrales Restaurant - Sistema de pedidos cargado');
+
+
+
+// ===== SISTEMA DE LOGIN ADMINISTRATIVO =====
+
+function abrirLoginAdmin() {
+    const modalHTML = `
+        <div class="modal-overlay" onclick="cerrarLoginAdmin()"></div>
+        <div class="modal-login-content">
+            <button class="close-login" onclick="cerrarLoginAdmin()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-login-header">
+                <h2>
+                    <i class="fas fa-user-shield"></i>
+                    Acceso Administrativo
+                </h2>
+                <p>Corrales Restaurant - Panel de Control</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group-login">
+                    <label for="admin-username">
+                        <i class="fas fa-user"></i> Usuario
+                    </label>
+                    <input type="text" id="admin-username" class="form-input-login" 
+                           placeholder="Ingresa tu usuario" value="admin">
+                </div>
+                
+                <div class="form-group-login">
+                    <label for="admin-password">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <input type="password" id="admin-password" class="form-input-login" 
+                           placeholder="Ingresa tu contraseña" value="admin123">
+                </div>
+                
+                <div class="login-error" id="login-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Usuario o contraseña incorrectos
+                </div>
+                
+                <button class="login-btn" onclick="iniciarSesionAdmin()" id="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </button>
+                
+                <div class="login-footer">
+                    <p><strong>Credenciales por defecto:</strong></p>
+                    <p>Usuario: <strong>admin</strong> | Contraseña: <strong>admin123</strong></p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-login';
+    modal.id = 'modal-login-admin';
+    modal.innerHTML = modalHTML;
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    // Permitir login con Enter
+    document.getElementById('admin-password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            iniciarSesionAdmin();
+        }
+    });
+}
+
+function cerrarLoginAdmin() {
+    const modal = document.getElementById('modal-login-admin');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+async function iniciarSesionAdmin() {
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    const errorDiv = document.getElementById('login-error');
+    const loginBtn = document.getElementById('btn-login');
+    
+    // Validación básica
+    if (!username || !password) {
+        mostrarErrorLogin('Por favor completa todos los campos');
+        return;
+    }
+    
+    // Mostrar loading
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+    loginBtn.disabled = true;
+    errorDiv.style.display = 'none';
+    
+    try {
+        // Hacer petición a la API de login
+        const response = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Login exitoso
+            cerrarLoginAdmin();
+            mostrarNotificacion(`✅ Bienvenido, ${data.usuario.username}. Redirigiendo al panel...`, 'success');
+            
+            // Guardar sesión en localStorage
+            localStorage.setItem('adminSession', JSON.stringify({
+                usuario: data.usuario,
+                timestamp: Date.now()
+            }));
+            
+            // Redirigir al panel admin
+            setTimeout(() => {
+                window.location.href = '/admin';
+            }, 1500);
+            
+        } else {
+            // Login fallido
+            mostrarErrorLogin(data.message || 'Credenciales incorrectas');
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
+            loginBtn.disabled = false;
+        }
+        
+    } catch (error) {
+        console.error('Error en login:', error);
+        
+        // Fallback para desarrollo (usar credenciales por defecto)
+        if ((username === 'admin' && password === 'admin123') || 
+            (username === 'corrales' && password === 'restaurant2024')) {
+            
+            cerrarLoginAdmin();
+            mostrarNotificacion('✅ Acceso concedido. Redirigiendo al panel...', 'success');
+            
+            localStorage.setItem('adminSession', JSON.stringify({
+                usuario: { username: username, rol: 'admin' },
+                timestamp: Date.now()
+            }));
+            
+            setTimeout(() => {
+                window.location.href = '/admin';
+            }, 1500);
+            
+        } else {
+            mostrarErrorLogin('Error de conexión. Intenta nuevamente.');
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
+            loginBtn.disabled = false;
+        }
+    }
+}
+
+function mostrarErrorLogin(mensaje) {
+    const errorDiv = document.getElementById('login-error');
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${mensaje}`;
+    errorDiv.style.display = 'block';
+    
+    // Efecto de shake en el formulario
+    const form = document.querySelector('.modal-login-content');
+    form.style.animation = 'shake 0.5s ease-in-out';
+    setTimeout(() => {
+        form.style.animation = '';
+    }, 500);
+}
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(event) {
+    const modalLogin = document.getElementById('modal-login-admin');
+    if (event.key === 'Escape' && modalLogin) {
+        cerrarLoginAdmin();
+    }
+});
