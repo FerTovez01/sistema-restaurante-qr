@@ -10,11 +10,25 @@
 <body>
     <div class="app-container">
         <!-- Header Elegante -->
-       <!-- Cambia esta línea -->
-<div class="logo">
-    <i class="fas fa-utensils"></i>
-    <span>CORRALES RESTAURANT</span>
-</div>
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>CORRALES RESTAURANT</span>
+            </div>
+            
+            <!-- BOTÓN ADMINISTRADOR (NUEVO) -->
+            <div class="admin-access">
+                <button class="admin-btn" onclick="abrirLoginAdmin()">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </button>
+            </div>
+
+            <div class="mesa-info">
+                <i class="fas fa-table"></i>
+                <span id="mesa-numero">MESA-01</span>
+            </div>
+        </header>
 
         <!-- Selector Tipo Pedido -->
         <section class="selector-tipo">
