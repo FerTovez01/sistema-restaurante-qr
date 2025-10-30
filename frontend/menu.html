@@ -3,141 +3,736 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Digital | CORRALES RESTAURANT</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <title>Corrales Restaurant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== VARIABLES Y RESET ===== */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #c17a3d;
+            --accent: #d4a762;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --beige: #f5f1e8;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: #333;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 0 20px;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 70px;
+        }
+
+        .navbar-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo i {
+            color: var(--secondary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .navbar-item {
+            position: relative;
+        }
+
+        .navbar-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 16px;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-link:hover {
+            color: var(--secondary);
+        }
+
+        .navbar-link.active {
+            color: var(--secondary);
+        }
+
+        .navbar-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--gray);
+        }
+
+        /* ===== TARJETA DE MESA ===== */
+        .mesa-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .mesa-title {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .mesa-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+
+        /* ===== OPCIONES DE SERVICIO ===== */
+        .service-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .service-option {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .service-option.active {
+            background: var(--secondary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(193, 122, 61, 0.3);
+        }
+
+        .service-option:not(.active) {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid #e9ecef;
+        }
+
+        .service-option:not(.active):hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        /* ===== CATEGORÍAS DE MENÚ ===== */
+        .menu-categories {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .category-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: var(--light);
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid transparent;
+        }
+
+        .category-btn.active {
+            background: var(--secondary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(193, 122, 61, 0.3);
+        }
+
+        .category-btn:hover:not(.active) {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        /* ===== PRODUCTOS ===== */
+        .products-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--beige);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        /* ===== PÁGINAS OCULTAS ===== */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ===== CARRITO ===== */
+        .cart-items {
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-btn {
+            background: var(--light);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .item-quantity {
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .remove-btn {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .cart-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .summary-line.total {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--secondary);
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .checkout-btn {
+            background: var(--success);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .checkout-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        /* ===== PAGOS ===== */
+        .payment-methods {
+            margin: 20px 0;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            border-color: var(--secondary);
+            background: #f8f9fa;
+        }
+
+        .payment-option.selected {
+            border-color: var(--secondary);
+            background: rgba(193, 122, 61, 0.1);
+        }
+
+        .payment-icon {
+            font-size: 28px;
+            color: var(--secondary);
+            margin-right: 20px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-info strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .payment-info span {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .navbar-menu {
+                gap: 15px;
+            }
+            
+            .navbar-link {
+                font-size: 14px;
+            }
+            
+            .service-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .service-option {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-container {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 0;
+            }
+            
+            .navbar-logo {
+                margin-bottom: 15px;
+            }
+            
+            .navbar-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header Elegante -->
-        <header class="header">
-            <div class="logo">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
                 <i class="fas fa-utensils"></i>
-                <span>CORRALES RESTAURANT</span>
+                CORRALES RESTAURANT
             </div>
-            
-            <!-- BOTÓN ADMINISTRADOR (NUEVO) -->
-            <div class="admin-access">
-                <button class="admin-btn" onclick="abrirLoginAdmin()">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Admin</span>
+            <ul class="navbar-menu">
+                <li class="navbar-item">
+                    <a href="#" class="navbar-link active" data-page="menu">
+                        <i class="fas fa-book"></i>
+                        Menú
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" class="navbar-link" data-page="cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        Carrito
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" class="navbar-link" data-page="payments">
+                        <i class="fas fa-credit-card"></i>
+                        Pagos
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" class="navbar-link" data-page="orders">
+                        <i class="fas fa-clipboard-list"></i>
+                        Pedidos
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" class="navbar-link" data-page="admin">
+                        <i class="fas fa-user-cog"></i>
+                        Admin
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Página del Menú (activa por defecto) -->
+        <div class="page active" id="menu-page">
+            <div class="page-header">
+                <h1 class="page-title">Corrales Restaurant</h1>
+                <p class="page-subtitle">Admin - MESA-01</p>
+            </div>
+
+            <div class="mesa-card">
+                <h2 class="mesa-title">Mesa Actual</h2>
+                <div class="mesa-number">MESA-01</div>
+            </div>
+
+            <div class="service-options">
+                <div class="service-option active">Corner Aquí</div>
+                <div class="service-option">Para Llevar</div>
+                <div class="service-option">Delivery</div>
+            </div>
+
+            <div class="menu-categories">
+                <button class="category-btn active">
+                    <i class="fas fa-appetizer"></i>
+                    Entradas
                 </button>
-            </div>
-
-            <div class="mesa-info">
-                <i class="fas fa-table"></i>
-                <span id="mesa-numero">MESA-01</span>
-            </div>
-        </header>
-
-        <!-- Selector Tipo Pedido -->
-        <section class="selector-tipo">
-            <div class="tipo-buttons">
-                <button class="tipo-btn active" onclick="seleccionarTipo('local')">
+                <button class="category-btn">
                     <i class="fas fa-utensils"></i>
-                    <span>Comer Aquí</span>
+                    Platos Fuertes
                 </button>
-                <button class="tipo-btn" onclick="seleccionarTipo('llevar')">
-                    <i class="fas fa-box"></i>
-                    <span>Para Llevar</span>
+                <button class="category-btn">
+                    <i class="fas fa-wine-glass-alt"></i>
+                    Bebidas
                 </button>
-                <button class="tipo-btn" onclick="seleccionarTipo('delivery')">
-                    <i class="fas fa-motorcycle"></i>
-                    <span>Delivery</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Datos Cliente (solo llevar/delivery) -->
-        <section class="datos-cliente" id="datos-cliente" style="display: none;">
-            <div class="form-group">
-                <input type="text" id="cliente-nombre" placeholder="👤 Tu nombre completo" class="form-input">
-            </div>
-            <div class="form-group">
-                <input type="tel" id="cliente-telefono" placeholder="📞 Tu número de teléfono" class="form-input">
-            </div>
-            <div class="form-group" id="grupo-direccion" style="display: none;">
-                <textarea id="cliente-direccion" placeholder="🏠 Dirección completa para delivery" class="form-textarea"></textarea>
-            </div>
-        </section>
-
-        <!-- Navegación Categorías -->
-        <nav class="categorias-nav" id="categorias-nav">
-            <div class="categorias-container">
-                <!-- Las categorías se cargan dinámicamente -->
-            </div>
-        </nav>
-
-        <!-- Lista de Productos -->
-        <main class="productos-main">
-            <div class="productos-container" id="productos-container">
-                <!-- Los productos se cargan dinámicamente -->
-            </div>
-        </main>
-    </div>
-
-    <!-- Carrito Flotante -->
-    <div class="carrito-flotante" id="carrito-flotante" onclick="abrirCarrito()">
-        <div class="carrito-icon">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="carrito-badge" id="carrito-contador">0</span>
-        </div>
-        <div class="carrito-total" id="carrito-total">$0.00</div>
-    </div>
-
-    <!-- Modal Carrito -->
-    <div class="modal" id="modal-carrito">
-        <div class="modal-overlay" onclick="cerrarCarrito()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-shopping-bag"></i>
-                    Tu Pedido
-                </h2>
-                <button class="modal-close" onclick="cerrarCarrito()">
-                    <i class="fas fa-times"></i>
+                <button class="category-btn">
+                    <i class="fas fa-ice-cream"></i>
+                    Postres
                 </button>
             </div>
-            
-            <div class="modal-body">
-                <div class="carrito-items" id="carrito-items">
-                    <!-- Items del carrito -->
+
+            <div class="products-section">
+                <h2 class="section-title">Entradas</h2>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No hay productos</h3>
+                    <p>Próximamente más opciones...</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Página del Carrito -->
+        <div class="page" id="cart-page">
+            <div class="page-header">
+                <h1 class="page-title">Carrito de Compras</h1>
+                <p class="page-subtitle">Revisa y modifica tu pedido</p>
+            </div>
+
+            <div class="products-section">
+                <div class="empty-state">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Carrito vacío</h3>
+                    <p>Agrega productos desde el menú</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página de Pagos -->
+        <div class="page" id="payments-page">
+            <div class="page-header">
+                <h1 class="page-title">Métodos de Pago</h1>
+                <p class="page-subtitle">Selecciona tu forma de pago preferida</p>
+            </div>
+
+            <div class="products-section">
+                <div class="payment-methods">
+                    <div class="payment-option selected">
+                        <div class="payment-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="payment-info">
+                            <strong>Efectivo</strong>
+                            <span>Paga al momento de recibir tu pedido</span>
+                        </div>
+                    </div>
+                    <div class="payment-option">
+                        <div class="payment-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="payment-info">
+                            <strong>Tarjeta de Crédito/Débito</strong>
+                            <span>Pago seguro con tarjeta</span>
+                        </div>
+                    </div>
+                    <div class="payment-option">
+                        <div class="payment-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="payment-info">
+                            <strong>Pago Móvil</strong>
+                            <span>Transferencia desde tu teléfono</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página de Pedidos -->
+        <div class="page" id="orders-page">
+            <div class="page-header">
+                <h1 class="page-title">Mis Pedidos</h1>
+                <p class="page-subtitle">Historial y estado de tus pedidos</p>
+            </div>
+
+            <div class="products-section">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No hay pedidos recientes</h3>
+                    <p>Realiza tu primer pedido desde el menú</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página de Admin -->
+        <div class="page" id="admin-page">
+            <div class="page-header">
+                <h1 class="page-title">Panel de Administración</h1>
+                <p class="page-subtitle">Gestiona tu restaurante</p>
+            </div>
+
+            <div class="products-section">
+                <div class="empty-state">
+                    <i class="fas fa-user-cog"></i>
+                    <h3>Acceso restringido</h3>
+                    <p>Esta área es solo para administradores autorizados</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Navegación entre páginas
+        document.querySelectorAll('.navbar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
                 
-                <div class="carrito-resumen">
-                    <div class="resumen-line">
-                        <span>Subtotal:</span>
-                        <span id="resumen-subtotal">$0.00</span>
-                    </div>
-                    <div class="resumen-line">
-                        <span>Impuestos (10%):</span>
-                        <span id="resumen-impuestos">$0.00</span>
-                    </div>
-                    <div class="resumen-line total">
-                        <span>Total:</span>
-                        <span id="resumen-total">$0.00</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="cerrarCarrito()">
-                    Seguir Comprando
-                </button>
-                <button class="btn btn-primary" onclick="procesarPago()">
-                    <i class="fas fa-credit-card"></i>
-                    Proceder al Pago
-                </button>
-            </div>
-        </div>
-    </div>
+                // Remover clase active de todos los enlaces
+                document.querySelectorAll('.navbar-link').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Agregar clase active al enlace clickeado
+                this.classList.add('active');
+                
+                // Ocultar todas las páginas
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Mostrar la página correspondiente
+                const pageId = this.getAttribute('data-page') + '-page';
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
 
-    <!-- Loading Spinner -->
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>Cargando menú...</p>
-    </div>
+        // Cambiar opciones de servicio
+        document.querySelectorAll('.service-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.service-option').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
 
-    <script src="app.js"></script>
+        // Cambiar categorías del menú
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Seleccionar método de pago
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.payment-option').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+    </script>
 </body>
 </html>
