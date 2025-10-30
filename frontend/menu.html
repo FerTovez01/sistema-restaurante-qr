@@ -597,6 +597,46 @@
             background: var(--light);
         }
 
+        /* ===== LOADING ===== */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--light);
+            border-left: 4px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 18px;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .navbar-menu {
@@ -641,6 +681,12 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Redirigiendo al panel de administración...</p>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
@@ -913,6 +959,9 @@
     </div>
 
     <script>
+        // URL del panel de administración
+        const ADMIN_PANEL_URL = "https://sistema-restaurante-qr-1.onrender.com/admin";
+
         // Navegación entre páginas
         document.querySelectorAll('.navbar-link').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -1012,9 +1061,13 @@
             
             // Credenciales de prueba
             if (username === 'admin' && password === '1234') {
-                alert('Inicio de sesión exitoso');
-                document.getElementById('login-modal').classList.remove('active');
-                // Aquí podrías redirigir al panel de admin real
+                // Mostrar pantalla de carga
+                document.getElementById('loading').classList.add('active');
+                
+                // Redirigir después de 2 segundos (para mostrar la pantalla de carga)
+                setTimeout(() => {
+                    window.location.href = ADMIN_PANEL_URL;
+                }, 2000);
             } else {
                 alert('Usuario o contraseña incorrectos');
             }
